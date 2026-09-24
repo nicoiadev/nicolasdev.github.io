@@ -1,5 +1,4 @@
-// db.js
-// Aquí pegaremos tu configuración de Firebase cuando me la pases.
+
 const firebaseConfig = {
   apiKey: "AIzaSyCf5Cn9gfOPyNzM-GS09Rn99MmMFJrnqRg",
   authDomain: "universo-recuerdos-9ade9.firebaseapp.com",
@@ -7,7 +6,6 @@ const firebaseConfig = {
   projectId: "universo-recuerdos-9ade9"
 };
 
-// Inicializar Firebase
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
