@@ -12,10 +12,8 @@
 </head>
 <body>
 
-  <!-- ===== CANVAS UNIVERSO ===== -->
   <canvas id="universo-canvas"></canvas>
 
-  <!-- ===== PLANETAS DECORATIVOS ===== -->
   <div class="planeta planeta-1" aria-hidden="true">
     <div class="planeta-anillo"></div>
   </div>
@@ -25,13 +23,11 @@
   <div class="luna luna-2" aria-hidden="true"></div>
   <div class="cometa" id="cometa" aria-hidden="true"><div class="cometa-cola"></div></div>
 
-  <!-- ===== NEBULA OVERLAYS ===== -->
   <div class="nebula nebula-1" aria-hidden="true"></div>
   <div class="nebula nebula-2" aria-hidden="true"></div>
   <div class="nebula nebula-3" aria-hidden="true"></div>
   <div class="nebula nebula-4" aria-hidden="true"></div>
 
-  <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="header-content">
       <div class="logo">
@@ -54,7 +50,6 @@
     </div>
   </header>
 
-  <!-- ===== HERO ===== -->
   <section class="hero" id="hero">
     <div class="hero-content">
       <p class="hero-eyebrow">∞ Cada momento contigo es eterno</p>
@@ -70,7 +65,7 @@
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
-          <span class="stat-num" id="dias-juntos">0</span>
+          <span class="stat-num" id="dias-juntos">33</span>
           <span class="stat-label">Días juntos</span>
         </div>
         <div class="stat-divider"></div>
@@ -91,7 +86,6 @@
     <div class="hero-ring hero-ring-2"></div>
   </section>
 
-  <!-- ===== GALERIA ===== -->
   <main class="galeria-container" id="galeria-container">
     <div class="galeria-header">
       <h2 class="galeria-titulo">✦ Nuestra Galaxia de Recuerdos ✦</h2>
@@ -115,8 +109,6 @@
       </button>
     </div>
   </main>
-
-  <!-- ===== MODAL AÑADIR ===== -->
   <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-titulo-h">
     <div class="modal" id="modal">
       <button class="modal-close" id="modal-close" aria-label="Cerrar modal">&times;</button>
@@ -128,7 +120,6 @@
 
       <form id="form-recuerdo" novalidate>
 
-        <!-- IMAGEN -->
         <div class="form-group">
           <label>Foto del Recuerdo</label>
           <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="Subir imagen">
@@ -212,12 +203,10 @@
     </div>
   </div>
 
-  <!-- ===== MODAL VER RECUERDO ===== -->
   <div class="modal-overlay" id="modal-ver-overlay" role="dialog" aria-modal="true" aria-labelledby="ver-titulo">
     <div class="modal modal-ver" id="modal-ver">
       <button class="modal-close" id="modal-ver-close" aria-label="Cerrar">&times;</button>
 
-      <!-- Foto si existe -->
       <div class="ver-foto-wrap" id="ver-foto-wrap" style="display:none;">
         <img id="ver-foto" src="" alt="Foto del recuerdo" class="ver-foto" />
         <div class="ver-foto-overlay"></div>
@@ -238,16 +227,13 @@
     </div>
   </div>
 
-  <!-- ===== LIGHTBOX ===== -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
     <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar imagen">&times;</button>
     <img id="lightbox-img" src="" alt="Foto ampliada" />
   </div>
 
-  <!-- ===== TOAST ===== -->
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-  <!-- ===== FIREBASE & SCRIPTS ===== -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="db.js"></script>
