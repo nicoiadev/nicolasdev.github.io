@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Galaxia de Recuerdos 🌌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --grad: linear-gradient(135deg,#a855f7,#ec4899);
+      --font: 'Outfit', sans-serif;
+      --display: 'Playfair Display', serif;
+    }
+
+    html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:var(--font); }
+
+    #gc { position:fixed; inset:0; display:block; }
+
+    /* ── HEADER ── */
+    .g-ui {
+      position:fixed; top:0; left:0; right:0; z-index:50;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 28px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
+      pointer-events:none;
+    }
+    .btn-back {
+      pointer-events:all;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 20px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:50px;
+      color:rgba(255,255,255,0.8);
+      font-size:0.88rem; font-weight:500;
+      text-decoration:none;
+      transition:all 0.3s ease;
+      backdrop-filter:blur(10px);
+    }
+    .btn-back:hover { background:rgba(168,85,247,0.25); border-color:rgba(168,85,247,0.5); color:#fff; }
+
+    .g-title-wrap { text-align:center; }
+    .g-title {
+      font-family:var(--display);
+      font-size:clamp(1.2rem,3vw,1.9rem);
+      font-weight:700;
+      background:var(--grad);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .g-subtitle { font-size:0.75rem; color:rgba(255,255,255,0.4); margin-top:2px; letter-spacing:1px; }
+
+    .g-count {
+      pointer-events:none;
+      font-size:0.82rem; color:rgba(255,255,255,0.5);
+      text-align:right; line-height:1.5;
+    }
+    .g-count strong { color:#a855f7; }
+
+    /* ── HINT BOTTOM ── */
+    .g-hint {
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      font-size:0.78rem; color:rgba(255,255,255,0.35);
+      letter-spacing:1px; pointer-events:none; z-index:50;
+      animation:hint-fade 3s ease-in-out infinite;
+    }
+    @keyframes hint-fade { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
+
+    /* ── POPUP RECUERDO ── */
+    .mem-backdrop {
+      position:fixed; inset:0; z-index:100;
+      background:rgba(0,0,0,0.85);
+      backdrop-filter:blur(8px);
+      opacity:0; visibility:hidden;
+      transition:opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .mem-backdrop.open { opacity:1; visibility:visible; }
+
+    .mem-popup {
+      position:fixed; z-index:110;
+      left:50%; top:50%;
+      transform:translate(-50%,-50%) scale(0.92);
+      width:min(480px, 92vw);
+      background:linear-gradient(160deg,#0d0d1e,#0a0a16);
+      border:1px solid rgba(168,85,247,0.2);
+      border-radius:28px;
+      overflow:hidden;
+      opacity:0; visibility:hidden;
+      transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .mem-popup.open { opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1); }
+
+    .mem-foto-wrap {
+      width:100%; height:200px; overflow:hidden; position:relative;
+      display:none;
+    }
+    .mem-foto-wrap.visible { display:block; }
+    .mem-foto { width:100%; height:100%; object-fit:cover; }
+    .mem-foto-grad {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom,transparent 40%,#0d0d1e);
+    }
+
+    .mem-header-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:22px 28px 10px;
+      background:var(--mem-grad, var(--grad));
+      position:relative; overflow:hidden;
+    }
+    .mem-header-bar::before { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.3); }
+    .mem-popup.has-foto .mem-header-bar { background:none; border-bottom:1px solid rgba(255,255,255,0.07); padding-top:14px; }
+    .mem-popup.has-foto .mem-header-bar::before { display:none; }
+    .mem-emoji-big { font-size:2.6rem; position:relative; z-index:1; }
+    .mem-badge {
+      position:relative; z-index:1;
+      font-size:0.7rem; padding:4px 12px;
+      border-radius:50px;
+      background:rgba(255,255,255,0.18);
+      color:#fff; font-weight:600;
+      text-transform:uppercase; letter-spacing:1px;
+    }
+
+    .mem-body { padding:20px 28px 24px; }
+    .mem-titulo {
+      font-family:var(--display);
+      font-size:1.45rem; font-weight:700;
+      color:#f1f5f9; margin-bottom:6px; line-height:1.3;
+    }
+    .mem-fecha { font-size:0.82rem; color:#475569; margin-bottom:14px; }
+    .mem-desc { font-size:0.92rem; color:#94a3b8; line-height:1.75; }
+
+    .mem-close {
+      position:absolute; top:14px; right:14px; z-index:120;
+      width:34px; height:34px; border-radius:50%;
+      background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); font-size:1.1rem;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:all 0.2s ease;
+    }
+    .mem-close:hover { background:rgba(168,85,247,0.4); }
+
+    /* ── EMPTY MSG ── */
+    .g-empty {
+      position:fixed; bottom:80px; left:50%;
+      transform:translateX(-50%);
+      text-align:center;
+      color:rgba(255,255,255,0.35);
+      font-size:0.85rem; line-height:1.8;
+      pointer-events:none; z-index:50;
+      display:none;
+    }
+    .g-empty.visible { display:block; }
+
+    /* ── NODE TOOLTIP ── */
+    #node-tooltip {
+      position:fixed; z-index:60;
+      padding:8px 16px;
+      background:rgba(10,10,22,0.9);
+      border:1px solid rgba(168,85,247,0.3);
+      border-radius:50px;
+      font-size:0.82rem; color:#fff;
+      pointer-events:none;
+      opacity:0; transition:opacity 0.2s ease;
+      backdrop-filter:blur(8px);
+      white-space:nowrap;
+    }
+    #node-tooltip.visible { opacity:1; }
+  </style>
+</head>
+<body>
+
+<canvas id="gc"></canvas>
+
+<!-- UI -->
+<div class="g-ui">
+  <a href="index.html" class="btn-back">← Volver</a>
+  <div class="g-title-wrap">
+    <h1 class="g-title">Galaxia de Recuerdos</h1>
+    <p class="g-subtitle">Haz clic en un recuerdo para revivir el momento</p>
+  </div>
+  <div class="g-count" id="g-count"></div>
+</div>
+
+<p class="g-hint" id="g-hint">✦ Los recuerdos orbitan alrededor de nuestro universo ✦</p>
+
+<div class="g-empty" id="g-empty">
+  🌠 Tu galaxia está vacía<br/>
+  <span style="font-size:0.78rem">Añade recuerdos desde la página principal</span>
+</div>
+
+<!-- Node tooltip -->
+<div id="node-tooltip"></div>
+
+<!-- Backdrop -->
+<div class="mem-backdrop" id="mem-backdrop"></div>
+
+<!-- Popup -->
+<div class="mem-popup" id="mem-popup">
+  <button class="mem-close" id="mem-close">✕</button>
+  <div class="mem-foto-wrap" id="mem-foto-wrap">
+    <img class="mem-foto" id="mem-foto" src="" alt="Foto del recuerdo"/>
+    <div class="mem-foto-grad"></div>
+  </div>
+  <div class="mem-header-bar" id="mem-header-bar">
+    <span class="mem-emoji-big" id="mem-emoji-big">💖</span>
+    <span class="mem-badge" id="mem-badge">Especial</span>
+  </div>
+  <div class="mem-body">
+    <h2 class="mem-titulo" id="mem-titulo"></h2>
+    <p class="mem-fecha" id="mem-fecha"></p>
+    <p class="mem-desc" id="mem-desc"></p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="db.js"></script>
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const CFG = {
+  PERSP:        0.28,   // Slightly more tilt
+  MAX_R:        1100,   // MASSIVE zoom (visualizing from much closer)
+  NUM_DISK:     5500,   // Dense arms
+  NUM_DUST:     2200,   // Lots of space dust
+  NUM_HEART:    1200,   // Heart particles
+  NUM_BG_STARS: 500,    // More stars
+  NUM_MAGIC:    180,    // Floating foreground magical stardust
+  HEART_SCALE:  6.0,    // Shrink the heart drastically
+  ROTATE_SPEED: 0.00035,
+  NODE_R:       44,     // Even bigger memory nodes
+};
+
+const GRAD_MAP = {
+  purple: ['#a855f7','#ec4899'],
+  blue:   ['#3b82f6','#06b6d4'],
+  rose:   ['#f43f5e','#fb7185'],
+  amber:  ['#f59e0b','#f97316'],
+  teal:   ['#14b8a6','#84cc16'],
+  indigo: ['#6366f1','#a855f7'],
+};
+const BADGE_LABEL = { especial:'💖 Especial', viaje:'✈️ Viaje', cotidiano:'☕ Cotidiano', celebracion:'🎉 Celebración' };
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const canvas = document.getElementById('gc');
+const ctx = canvas.getContext('2d');
+
+let W, H, cx, cy, heartCY;
+let galaxyAngle = 0;
+let t = 0;
+let mouse = { x:-9999, y:-9999 };
+let hoveredNode = null;
+let selectedMemory = null;
+
+// Particle arrays
+let bgStars = [];
+let diskParticles = [];
+let dustParticles = [];
+let heartParticles = [];
+let beamParticles = [];
+let memoryNodes = [];
+let magicParticles = [];
+let preloadedImages = {};
+
+/* ═══════════════════════════════════════════
+   LOAD DATA
+═══════════════════════════════════════════ */
+function loadMemories() {
+  // Ahora Firebase maneja la carga. Esta función se mantiene vacía para compatibilidad si fuera necesaria.
+  return [];
+}
+
+function formatFecha(iso) {
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  const M = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${parseInt(d)} de ${M[parseInt(m)-1]}, ${y}`;
+}
+
+/* ═══════════════════════════════════════════
+   GENERATORS
+═══════════════════════════════════════════ */
+
+function genBgStars() {
+  bgStars = [];
+  for (let i = 0; i < CFG.NUM_BG_STARS; i++) {
+    bgStars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.4 + 0.2,
+      a: Math.random() * 0.6 + 0.1,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.02 + 0.005,
+    });
+  }
+}
+
+function genDiskParticles() {
+  diskParticles = [];
+  const a = 40, b = 0.175; // a=40 scales the entire spiral mathematical base
+  for (let i = 0; i < CFG.NUM_DISK; i++) {
+    const arm = i % 2;
+    const armOff = arm * Math.PI;
+    const theta = (i / CFG.NUM_DISK) * Math.PI * 4.5 + Math.random() * 0.6;
+    const r = Math.min(a * Math.exp(b * theta) + Math.random() * 30, CFG.MAX_R);
+
+    // angular scatter increases with radius
+    const scatter = (Math.random() - 0.5) * (0.3 + r / CFG.MAX_R * 0.8);
+    const baseAngle = theta + armOff + scatter;
+
+    const rNorm = r / CFG.MAX_R; // 0–1
+    // Color: center=warm orange, mid=brownish, edge=dark red/brown
+    let color;
+    if (rNorm < 0.15)      color = `rgba(255,210,120,`;
+    else if (rNorm < 0.35) color = `rgba(240,140,60,`;
+    else if (rNorm < 0.6)  color = `rgba(180,70,40,`;
+    else                   color = `rgba(120,40,30,`;
+
+    const baseAlpha = (1 - rNorm * 0.75) * (Math.random() * 0.55 + 0.2);
+
+    diskParticles.push({
+      baseAngle,
+      r,
+      rNorm,
+      color,
+      baseAlpha,
+      size: Math.random() * (rNorm < 0.3 ? 2.2 : 1.6) + 0.3,
+    });
+  }
+}
+
+function genDustParticles() {
+  dustParticles = [];
+  for (let i = 0; i < CFG.NUM_DUST; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = Math.random() * CFG.MAX_R * 1.3;
+    dustParticles.push({
+      baseAngle: angle,
+      r,
+      color: `rgba(80,30,20,`,
+      baseAlpha: Math.random() * 0.18 + 0.04,
+      size: Math.random() * 1.2 + 0.3,
+    });
+  }
+}
+
+function genHeartParticles() {
+  heartParticles = [];
+  const S = CFG.HEART_SCALE;
+
+  for (let i = 0; i < CFG.NUM_HEART; i++) {
+    const t0 = (i / CFG.NUM_HEART) * Math.PI * 2;
+    // parametric heart
+    const hx = 16 * Math.pow(Math.sin(t0), 3) * S;
+    const hy = -(13*Math.cos(t0) - 5*Math.cos(2*t0) - 2*Math.cos(3*t0) - Math.cos(4*t0)) * S;
+
+    // add cloud-like noise
+    const noise = S * 0.85;
+    const nx = hx + (Math.random() - 0.5) * noise;
+    const ny = hy + (Math.random() - 0.5) * noise;
+
+    const rr = Math.random();
+    const colors = ['#f0abfc','#ec4899','#c026d3','#e879f9','#f472b6','#db2777'];
+    const col = colors[Math.floor(Math.random() * colors.length)];
+
+    heartParticles.push({
+      x: nx, y: ny,
+      r: Math.random() * 2.2 + 0.4,
+      col,
+      baseAlpha: Math.random() * 0.75 + 0.2,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.035 + 0.008,
+      // some particles drift slightly
+      drift: (Math.random() - 0.5) * 0.15,
+    });
+  }
+}
+
+function genBeamParticles() {
+  beamParticles = [];
+  for (let i = 0; i < 60; i++) {
+    beamParticles.push({
+      progress: Math.random(), // 0=galaxy, 1=heart
+      offset: (Math.random() - 0.5) * 12,
+      speed: Math.random() * 0.004 + 0.002,
+      size: Math.random() * 2.5 + 0.5,
+      alpha: Math.random() * 0.6 + 0.2,
+    });
+  }
+}
+
+function genMagicParticles() {
+  magicParticles = [];
+  for (let i = 0; i < CFG.NUM_MAGIC; i++) {
+    magicParticles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 2.5 + 0.5,
+      speedX: (Math.random() - 0.5) * 0.6,
+      speedY: (Math.random() - 0.5) * 0.6 - 0.3, // Slight upward drift
+      phase: Math.random() * Math.PI * 2,
+      color: Math.random() > 0.5 ? 'rgba(168,85,247,' : 'rgba(236,72,153,'
+    });
+  }
+}
+
+function placeMemoryNodes(memories) {
+  memoryNodes = [];
+  const count = memories.length;
+  if (!count) return;
+
+  for (let i = 0; i < count; i++) {
+    const mem = memories[i];
+    // Spread along spiral: alternate arms
+    const frac = (i / count);
+    const theta = 1.0 + frac * Math.PI * 3.5;
+    const a = 40, b = 0.175; // Match new spiral scale
+    const r = Math.min(a * Math.exp(b * theta) + 120, CFG.MAX_R - 80);
+    const armOff = (i % 2) * Math.PI;
+
+    const startAngle = theta + armOff;
+    const orbSpeed = 0.00025 + (Math.random() * 0.0002) * (1 / (r * 0.01 + 1));
+
+    memoryNodes.push({
+      memory: mem,
+      r,
+      angle: startAngle,
+      orbSpeed,
+      pulse: Math.random() * Math.PI * 2,
+      img: null, // will be set if memory has image
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PRELOAD IMAGES
+═══════════════════════════════════════════ */
+function preloadImages(memories) {
+  memories.forEach((mem, i) => {
+    if (mem.imagen) {
+      const img = new Image();
+      img.onload = () => { preloadedImages[mem.id] = img; };
+      img.src = mem.imagen;
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   DRAW FUNCTIONS
+═══════════════════════════════════════════ */
+
+function drawBgStars() {
+  for (const s of bgStars) {
+    s.phase += s.speed;
+    const a = s.a * (0.7 + 0.3 * Math.sin(s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.fill();
+  }
+}
+
+function drawDisk() {
+  // All disk + dust particles
+  const allDisk = [...dustParticles, ...diskParticles];
+  for (const p of allDisk) {
+    const angle = p.baseAngle + galaxyAngle;
+    const dx = p.r * Math.cos(angle);
+    const dy = p.r * Math.sin(angle) * CFG.PERSP;
+    const sx = cx + dx;
+    const sy = cy + dy;
+
+    // cull offscreen
+    if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
+
+    ctx.beginPath();
+    ctx.arc(sx, sy, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `${p.color}${p.baseAlpha})`;
+    ctx.fill();
+  }
+}
+
+function drawGalaxyGlow() {
+  // Core glow layers
+  const glows = [
+    { r: 240, c: [255,180,80], a: 0.08 },
+    { r: 140, c: [255,210,120], a: 0.18 },
+    { r: 65,  c: [255,240,180], a: 0.45 },
+    { r: 28,  c: [255,255,240], a: 0.8 },
+  ];
+  for (const g of glows) {
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, g.r);
+    grad.addColorStop(0, `rgba(${g.c.join(',')},${g.a})`);
+    grad.addColorStop(1, `rgba(${g.c.join(',')},0)`);
+    ctx.beginPath();
+    ctx.arc(cx, cy, g.r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // Accretion disk ring (perspective ellipse)
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(1, CFG.PERSP);
+  for (let ring = 0; ring < 3; ring++) {
+    const rr = 32 + ring * 12; // Scaled up ring
+    const rGrad = ctx.createRadialGradient(0, 0, rr - 6, 0, 0, rr + 6);
+    rGrad.addColorStop(0, 'rgba(255,170,50,0)');
+    rGrad.addColorStop(0.5, `rgba(255,200,80,${0.6 - ring * 0.15})`);
+    rGrad.addColorStop(1, 'rgba(255,120,30,0)');
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, 0, Math.PI * 2);
+    ctx.strokeStyle = rGrad;
+    ctx.lineWidth = 6;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Black hole center
+  ctx.beginPath();
+  ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,180,60,0.4)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawBeam() {
+  const heartBottom = { x: cx, y: heartCY + CFG.HEART_SCALE * 4 };
+  const beamTop = { x: cx, y: heartCY - CFG.HEART_SCALE * 13 };
+
+  // Main beam glow
+  const bGrad = ctx.createLinearGradient(cx, cy, cx, beamTop.y);
+  bGrad.addColorStop(0, 'rgba(255,180,60,0.0)');
+  bGrad.addColorStop(0.15, 'rgba(200,80,200,0.25)');
+  bGrad.addColorStop(0.7, 'rgba(220,60,180,0.35)');
+  bGrad.addColorStop(1, 'rgba(240,50,200,0.0)');
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx, beamTop.y);
+  ctx.strokeStyle = bGrad;
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // Thin bright core
+  const bGrad2 = ctx.createLinearGradient(cx, cy, cx, beamTop.y);
+  bGrad2.addColorStop(0, 'rgba(255,220,100,0)');
+  bGrad2.addColorStop(0.1, 'rgba(255,180,255,0.6)');
+  bGrad2.addColorStop(0.85, 'rgba(255,120,240,0.5)');
+  bGrad2.addColorStop(1, 'rgba(255,100,220,0)');
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx, beamTop.y);
+  ctx.strokeStyle = bGrad2;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Beam particles flowing up
+  for (const p of beamParticles) {
+    p.progress += p.speed;
+    if (p.progress > 1) p.progress = 0;
+    const py = cy + (beamTop.y - cy) * p.progress;
+    const px = cx + p.offset * (1 - p.progress * 0.7);
+    const a = p.alpha * (1 - Math.abs(p.progress - 0.5) * 1.6);
+    if (a <= 0) continue;
+    ctx.beginPath();
+    ctx.arc(px, py, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(240,100,240,${a})`;
+    ctx.fill();
+  }
+}
+
+function drawHeart() {
+  const heartBreath = 1 + 0.04 * Math.sin(t * 1.5); // Global heart breath
+
+  for (const p of heartParticles) {
+    p.phase += p.speed;
+    p.x += p.drift * 0.5;
+    // keep particles near original position (spring-like)
+    const alpha = p.baseAlpha * (0.5 + 0.5 * Math.sin(p.phase));
+
+    const sx = cx + p.x * heartBreath;
+    const sy = heartCY + p.y * heartBreath;
+
+    // Glow halo
+    const glowR = p.r * 4;
+    const gGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
+    gGrad.addColorStop(0, hexToRgba(p.col, alpha * 0.45));
+    gGrad.addColorStop(1, hexToRgba(p.col, 0));
+    ctx.beginPath();
+    ctx.arc(sx, sy, glowR, 0, Math.PI * 2);
+    ctx.fillStyle = gGrad;
+    ctx.fill();
+
+    // Core particle
+    ctx.beginPath();
+    ctx.arc(sx, sy, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(p.col, alpha);
+    ctx.fill();
+  }
+}
+
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+
+function drawMemoryNodes() {
+  const nodeR = CFG.NODE_R;
+
+  for (const node of memoryNodes) {
+    node.angle += node.orbSpeed;
+    node.pulse += 0.04;
+
+    const dx = node.r * Math.cos(node.angle);
+    const dy = node.r * Math.sin(node.angle) * CFG.PERSP;
+    const sx = cx + dx;
+    const sy = cy + dy;
+
+    // Cull offscreen
+    if (sx < -nodeR-10 || sx > W+nodeR+10 || sy < -nodeR-10 || sy > H+nodeR+10) continue;
+
+    const isHovered = hoveredNode === node;
+    const scale = isHovered ? 1.35 : 1 + 0.06 * Math.sin(node.pulse);
+    const rr = nodeR * scale;
+
+    const mem = node.memory;
+    const [c1, c2] = GRAD_MAP[mem.color] || ['#a855f7','#ec4899'];
+
+    // Outer glow
+    const glowA = isHovered ? 0.55 : 0.3 + 0.1 * Math.sin(node.pulse);
+    const glowGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rr * 2.5);
+    glowGrad.addColorStop(0, hexToRgba(c1, glowA));
+    glowGrad.addColorStop(1, hexToRgba(c1, 0));
+    ctx.beginPath();
+    ctx.arc(sx, sy, rr * 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = glowGrad;
+    ctx.fill();
+
+    // Ring
+    const ringGrad = ctx.createLinearGradient(sx - rr, sy - rr, sx + rr, sy + rr);
+    ringGrad.addColorStop(0, c1);
+    ringGrad.addColorStop(1, c2);
+    ctx.beginPath();
+    ctx.arc(sx, sy, rr + 3, 0, Math.PI * 2);
+    ctx.strokeStyle = ringGrad;
+    ctx.lineWidth = isHovered ? 3 : 2;
+    ctx.stroke();
+
+    // Photo or emoji background
+    if (preloadedImages[mem.id]) {
+      // Circular photo
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(sx, sy, rr, 0, Math.PI * 2);
+      ctx.clip();
+      const img = preloadedImages[mem.id];
+      ctx.drawImage(img, sx - rr, sy - rr, rr * 2, rr * 2);
+      // dim overlay
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.fillRect(sx - rr, sy - rr, rr * 2, rr * 2);
+      ctx.restore();
+    } else {
+      // Gradient circle
+      const bgGrad = ctx.createRadialGradient(sx - rr*0.3, sy - rr*0.3, 0, sx, sy, rr);
+      bgGrad.addColorStop(0, hexToRgba(c1, 0.35));
+      bgGrad.addColorStop(1, 'rgba(5,5,15,0.85)');
+      ctx.beginPath();
+      ctx.arc(sx, sy, rr, 0, Math.PI * 2);
+      ctx.fillStyle = bgGrad;
+      ctx.fill();
+
+      // Emoji
+      ctx.font = `${rr * 0.9}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(mem.emoji, sx, sy);
+    }
+
+    // Store screen pos for click detection
+    node._sx = sx;
+    node._sy = sy;
+    node._rr = rr;
+  }
+}
+
+function drawMagicParticles() {
+  for (const p of magicParticles) {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.phase += 0.015;
+
+    // Wrap around screen
+    if (p.x < -10) p.x = W + 10; else if (p.x > W + 10) p.x = -10;
+    if (p.y < -10) p.y = H + 10; else if (p.y > H + 10) p.y = -10;
+
+    const alpha = 0.2 + 0.6 * Math.sin(p.phase);
+    if (alpha <= 0) continue;
+
+    // Inner bright core
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + alpha + ')';
+    ctx.fill();
+    
+    // Outer glow for larger magic particles
+    if (p.r > 1.2) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + (alpha * 0.25) + ')';
+      ctx.fill();
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MAIN RENDER LOOP
+═══════════════════════════════════════════ */
+function draw() {
+  t += 0.01;
+  galaxyAngle += CFG.ROTATE_SPEED;
+
+  // Background
+  ctx.fillStyle = '#000008';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle nebula background
+  const nebGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.7);
+  nebGrad.addColorStop(0, 'rgba(30,8,50,0.4)');
+  nebGrad.addColorStop(0.5, 'rgba(10,3,25,0.2)');
+  nebGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = nebGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  drawBgStars();
+  drawDisk();
+  drawGalaxyGlow();
+  drawBeam();
+  drawHeart();
+  drawMemoryNodes();
+  drawMagicParticles();
+
+  requestAnimationFrame(draw);
+}
+
+/* ═══════════════════════════════════════════
+   INTERACTION
+═══════════════════════════════════════════ */
+canvas.addEventListener('mousemove', (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+
+  let found = null;
+  for (const node of memoryNodes) {
+    if (node._sx === undefined) continue;
+    const dx = e.clientX - node._sx;
+    const dy = e.clientY - node._sy;
+    if (Math.sqrt(dx*dx + dy*dy) < node._rr + 8) { found = node; break; }
+  }
+
+  hoveredNode = found;
+  canvas.style.cursor = found ? 'pointer' : 'default';
+
+  const tooltip = document.getElementById('node-tooltip');
+  if (found) {
+    tooltip.textContent = found.memory.titulo;
+    tooltip.style.left = (e.clientX + 16) + 'px';
+    tooltip.style.top  = (e.clientY - 10) + 'px';
+    tooltip.classList.add('visible');
+  } else {
+    tooltip.classList.remove('visible');
+  }
+});
+
+canvas.addEventListener('click', (e) => {
+  for (const node of memoryNodes) {
+    if (node._sx === undefined) continue;
+    const dx = e.clientX - node._sx;
+    const dy = e.clientY - node._sy;
+    if (Math.sqrt(dx*dx + dy*dy) < node._rr + 8) {
+      openPopup(node.memory);
+      return;
+    }
+  }
+});
+
+function openPopup(mem) {
+  selectedMemory = mem;
+  const popup = document.getElementById('mem-popup');
+  const backdrop = document.getElementById('mem-backdrop');
+  const headerBar = document.getElementById('mem-header-bar');
+  const fotoWrap = document.getElementById('mem-foto-wrap');
+  const fotoEl = document.getElementById('mem-foto');
+
+  // Photo
+  if (mem.imagen) {
+    fotoEl.src = mem.imagen;
+    fotoWrap.classList.add('visible');
+    popup.classList.add('has-foto');
+  } else {
+    fotoEl.src = '';
+    fotoWrap.classList.remove('visible');
+    popup.classList.remove('has-foto');
+  }
+
+  // Colors
+  const [c1, c2] = GRAD_MAP[mem.color] || ['#a855f7','#ec4899'];
+  headerBar.style.setProperty('--mem-grad', `linear-gradient(135deg,${c1},${c2})`);
+  popup.style.setProperty('--mem-grad', `linear-gradient(135deg,${c1},${c2})`);
+
+  document.getElementById('mem-emoji-big').textContent = mem.emoji;
+  document.getElementById('mem-badge').textContent = BADGE_LABEL[mem.categoria] || 'Especial';
+  document.getElementById('mem-titulo').textContent = mem.titulo;
+  document.getElementById('mem-fecha').textContent = '📅 ' + formatFecha(mem.fecha);
+  document.getElementById('mem-desc').textContent = mem.descripcion || 'Sin descripción añadida.';
+
+  backdrop.classList.add('open');
+  popup.classList.add('open');
+  canvas.style.cursor = 'default';
+}
+
+function closePopup() {
+  document.getElementById('mem-popup').classList.remove('open');
+  document.getElementById('mem-backdrop').classList.remove('open');
+  selectedMemory = null;
+}
+
+document.getElementById('mem-close').addEventListener('click', closePopup);
+document.getElementById('mem-backdrop').addEventListener('click', closePopup);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
+
+/* ═══════════════════════════════════════════
+   RESIZE
+═══════════════════════════════════════════ */
+function resize() {
+  // Force extreme high definition on all screens
+  const dpr = Math.max(window.devicePixelRatio || 1, 2.5);
+  W = window.innerWidth;
+  H = window.innerHeight;
+
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = `${W}px`;
+  canvas.style.height = `${H}px`;
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+  ctx.scale(dpr, dpr);
+
+  cx = W / 2;
+  cy = H * 0.65; // Push center slightly down
+  heartCY = cy - (H < 700 ? 250 : 350); // Move heart up accordingly
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+function init() {
+  resize();
+  window.addEventListener('resize', () => { resize(); genBgStars(); genMagicParticles(); });
+
+  genBgStars();
+  genDiskParticles();
+  genDustParticles();
+  genHeartParticles();
+  genBeamParticles();
+  genMagicParticles();
+
+  // Escuchar cambios en la base de datos de Firebase
+  db.ref('recuerdos').on('value', (snapshot) => {
+    const data = snapshot.val();
+    const memories = [];
+    if (data) {
+      for (const key in data) {
+        memories.push(data[key]);
+      }
+    }
+
+    // Stats
+    const countEl = document.getElementById('g-count');
+    countEl.innerHTML = `<strong>${memories.length}</strong> recuerdos<br/><strong>${memories.filter(m=>m.imagen).length}</strong> con foto`;
+
+    // Empty state
+    if (!memories.length) {
+      document.getElementById('g-empty').classList.add('visible');
+      document.getElementById('g-hint').style.display = 'none';
+    } else {
+      document.getElementById('g-empty').classList.remove('visible');
+      document.getElementById('g-hint').style.display = 'block';
+    }
+
+    placeMemoryNodes(memories);
+    preloadImages(memories);
+  });
+
+  draw();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

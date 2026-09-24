@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestro Universo de Recuerdos 💫</title>
+  <meta name="description" content="Un espacio mágico para guardar y revivir los recuerdos más bonitos juntos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== CANVAS UNIVERSO ===== -->
+  <canvas id="universo-canvas"></canvas>
+
+  <!-- ===== PLANETAS DECORATIVOS ===== -->
+  <div class="planeta planeta-1" aria-hidden="true">
+    <div class="planeta-anillo"></div>
+  </div>
+  <div class="planeta planeta-2" aria-hidden="true"></div>
+  <div class="planeta planeta-3" aria-hidden="true"></div>
+  <div class="luna luna-1" aria-hidden="true"></div>
+  <div class="luna luna-2" aria-hidden="true"></div>
+  <div class="cometa" id="cometa" aria-hidden="true"><div class="cometa-cola"></div></div>
+
+  <!-- ===== NEBULA OVERLAYS ===== -->
+  <div class="nebula nebula-1" aria-hidden="true"></div>
+  <div class="nebula nebula-2" aria-hidden="true"></div>
+  <div class="nebula nebula-3" aria-hidden="true"></div>
+  <div class="nebula nebula-4" aria-hidden="true"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">🌌</span>
+        <div>
+          <h1 class="logo-title">Nuestro Universo</h1>
+          <p class="logo-sub">de Recuerdos</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a href="galaxia.html" class="btn-galaxy" aria-label="Ver galaxia de recuerdos">
+          <span class="btn-icon">🌌</span>
+          <span>Ver Galaxia</span>
+        </a>
+        <button id="btn-agregar" class="btn-primary" aria-label="Añadir nuevo recuerdo">
+          <span class="btn-icon">✨</span>
+          <span>Nuevo Recuerdo</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">∞ Cada momento contigo es eterno</p>
+      <h2 class="hero-title">
+        Cada estrella es<br />
+        <em>un recuerdo nuestro</em>
+      </h2>
+      <p class="hero-desc">Guarda los momentos que hacen brillar nuestro universo.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num" id="total-recuerdos">0</span>
+          <span class="stat-label">Recuerdos</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num" id="dias-juntos">0</span>
+          <span class="stat-label">Días juntos</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num" id="fotos-guardadas">0</span>
+          <span class="stat-label">Fotos</span>
+        </div>
+      </div>
+      <a href="galaxia.html" class="btn-galaxy-hero" aria-label="Ver galaxia de recuerdos">
+        <span class="galaxy-btn-glow"></span>
+        <span class="btn-icon" style="font-size:1.4rem;">🌌</span>
+        <span>Ver Galaxia de Recuerdos</span>
+        <span style="opacity:0.7;font-size:0.85em;">→</span>
+      </a>
+    </div>
+    <div class="hero-orb"></div>
+    <div class="hero-ring hero-ring-1"></div>
+    <div class="hero-ring hero-ring-2"></div>
+  </section>
+
+  <!-- ===== GALERIA ===== -->
+  <main class="galeria-container" id="galeria-container">
+    <div class="galeria-header">
+      <h2 class="galeria-titulo">✦ Nuestra Galaxia de Recuerdos ✦</h2>
+      <div class="filtros" id="filtros" role="group" aria-label="Filtrar recuerdos">
+        <button class="filtro-btn active" data-filtro="todos" id="filtro-todos">🌌 Todos</button>
+        <button class="filtro-btn" data-filtro="especial" id="filtro-especial">💖 Especiales</button>
+        <button class="filtro-btn" data-filtro="viaje" id="filtro-viaje">✈️ Viajes</button>
+        <button class="filtro-btn" data-filtro="cotidiano" id="filtro-cotidiano">☕ Cotidianos</button>
+        <button class="filtro-btn" data-filtro="celebracion" id="filtro-celebracion">🎉 Celebraciones</button>
+      </div>
+    </div>
+
+    <div class="galeria" id="galeria" role="list" aria-label="Galería de recuerdos"></div>
+
+    <div class="empty-state" id="empty-state" role="status">
+      <div class="empty-icon">🌠</div>
+      <h3>Tu universo te espera</h3>
+      <p>Añade tu primer recuerdo y comienza a llenar el cosmos con momentos mágicos.</p>
+      <button class="btn-primary" onclick="document.getElementById('btn-agregar').click()">
+        <span class="btn-icon">✨</span> Añadir primer recuerdo
+      </button>
+    </div>
+  </main>
+
+  <!-- ===== MODAL AÑADIR ===== -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-titulo-h">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close" aria-label="Cerrar modal">&times;</button>
+      <div class="modal-header">
+        <span class="modal-icon">🌟</span>
+        <h2 id="modal-titulo-h">Nuevo Recuerdo</h2>
+        <p>Inmortaliza este momento en nuestro universo</p>
+      </div>
+
+      <form id="form-recuerdo" novalidate>
+
+        <!-- IMAGEN -->
+        <div class="form-group">
+          <label>Foto del Recuerdo</label>
+          <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="Subir imagen">
+            <input type="file" id="input-imagen" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
+            <div class="upload-placeholder" id="upload-placeholder">
+              <div class="upload-icon">🖼️</div>
+              <p class="upload-text">Arrastra una foto aquí o <span class="upload-link">haz clic para seleccionar</span></p>
+              <p class="upload-hint">PNG, JPG, WEBP · Máx 5 MB</p>
+            </div>
+            <div class="upload-preview" id="upload-preview" style="display:none;">
+              <img id="preview-img" src="" alt="Vista previa del recuerdo" />
+              <button type="button" class="upload-remove" id="btn-remove-img" aria-label="Eliminar imagen">✕</button>
+              <div class="upload-overlay-text">Imagen lista ✓</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-titulo">Título del Recuerdo *</label>
+          <input type="text" id="input-titulo" name="titulo" placeholder="Ej: Nuestra primera cita..." maxlength="60" required autocomplete="off" />
+          <span class="char-count" id="char-titulo">0/60</span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-descripcion">Descripción</label>
+          <textarea id="input-descripcion" name="descripcion" placeholder="Cuéntame todo sobre este momento especial... ¿Qué sentiste? ¿Qué pasó? ¿Por qué fue mágico?" rows="4" maxlength="500"></textarea>
+          <span class="char-count" id="char-desc">0/500</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-fecha">Fecha *</label>
+            <input type="date" id="input-fecha" name="fecha" required />
+          </div>
+          <div class="form-group">
+            <label for="input-categoria">Categoría</label>
+            <select id="input-categoria" name="categoria">
+              <option value="especial">💖 Especial</option>
+              <option value="viaje">✈️ Viaje</option>
+              <option value="cotidiano">☕ Cotidiano</option>
+              <option value="celebracion">🎉 Celebración</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Color del Recuerdo</label>
+          <div class="color-picker" id="color-picker" role="radiogroup" aria-label="Color del recuerdo">
+            <button type="button" class="color-opt active" data-color="purple" style="background: linear-gradient(135deg,#a855f7,#ec4899)" aria-label="Morado rosa" aria-pressed="true"></button>
+            <button type="button" class="color-opt" data-color="blue" style="background: linear-gradient(135deg,#3b82f6,#06b6d4)" aria-label="Azul cyan" aria-pressed="false"></button>
+            <button type="button" class="color-opt" data-color="rose" style="background: linear-gradient(135deg,#f43f5e,#fb7185)" aria-label="Rosa rojo" aria-pressed="false"></button>
+            <button type="button" class="color-opt" data-color="amber" style="background: linear-gradient(135deg,#f59e0b,#f97316)" aria-label="Ámbar naranja" aria-pressed="false"></button>
+            <button type="button" class="color-opt" data-color="teal" style="background: linear-gradient(135deg,#14b8a6,#84cc16)" aria-label="Verde teal" aria-pressed="false"></button>
+            <button type="button" class="color-opt" data-color="indigo" style="background: linear-gradient(135deg,#6366f1,#a855f7)" aria-label="Índigo morado" aria-pressed="false"></button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Emoji del Recuerdo</label>
+          <div class="emoji-picker" id="emoji-picker" role="radiogroup" aria-label="Emoji del recuerdo">
+            <button type="button" class="emoji-opt active" data-emoji="💖" aria-pressed="true">💖</button>
+            <button type="button" class="emoji-opt" data-emoji="🌙" aria-pressed="false">🌙</button>
+            <button type="button" class="emoji-opt" data-emoji="⭐" aria-pressed="false">⭐</button>
+            <button type="button" class="emoji-opt" data-emoji="🎉" aria-pressed="false">🎉</button>
+            <button type="button" class="emoji-opt" data-emoji="✈️" aria-pressed="false">✈️</button>
+            <button type="button" class="emoji-opt" data-emoji="🌸" aria-pressed="false">🌸</button>
+            <button type="button" class="emoji-opt" data-emoji="🔥" aria-pressed="false">🔥</button>
+            <button type="button" class="emoji-opt" data-emoji="🌊" aria-pressed="false">🌊</button>
+            <button type="button" class="emoji-opt" data-emoji="☕" aria-pressed="false">☕</button>
+            <button type="button" class="emoji-opt" data-emoji="🎵" aria-pressed="false">🎵</button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="btn-cancelar">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-guardar">
+            <span class="btn-icon">🌟</span> Guardar Recuerdo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL VER RECUERDO ===== -->
+  <div class="modal-overlay" id="modal-ver-overlay" role="dialog" aria-modal="true" aria-labelledby="ver-titulo">
+    <div class="modal modal-ver" id="modal-ver">
+      <button class="modal-close" id="modal-ver-close" aria-label="Cerrar">&times;</button>
+
+      <!-- Foto si existe -->
+      <div class="ver-foto-wrap" id="ver-foto-wrap" style="display:none;">
+        <img id="ver-foto" src="" alt="Foto del recuerdo" class="ver-foto" />
+        <div class="ver-foto-overlay"></div>
+      </div>
+
+      <div class="ver-header" id="ver-header">
+        <span class="ver-emoji" id="ver-emoji">💖</span>
+        <div class="ver-badge" id="ver-badge">especial</div>
+      </div>
+      <div class="ver-body">
+        <h2 class="ver-titulo" id="ver-titulo"></h2>
+        <p class="ver-fecha" id="ver-fecha"></p>
+        <p class="ver-desc" id="ver-desc"></p>
+      </div>
+      <div class="ver-actions">
+        <button class="btn-danger" id="btn-eliminar">🗑️ Eliminar recuerdo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar imagen">&times;</button>
+    <img id="lightbox-img" src="" alt="Foto ampliada" />
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ===== FIREBASE & SCRIPTS ===== -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
