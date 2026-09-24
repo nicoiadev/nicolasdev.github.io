@@ -20,7 +20,6 @@
 
     #gc { position:fixed; inset:0; display:block; }
 
-    /* ── HEADER ── */
     .g-ui {
       position:fixed; top:0; left:0; right:0; z-index:50;
       display:flex; align-items:center; justify-content:space-between;
@@ -60,7 +59,6 @@
     }
     .g-count strong { color:#a855f7; }
 
-    /* ── HINT BOTTOM ── */
     .g-hint {
       position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
       font-size:0.78rem; color:rgba(255,255,255,0.35);
@@ -69,7 +67,6 @@
     }
     @keyframes hint-fade { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
 
-    /* ── POPUP RECUERDO ── */
     .mem-backdrop {
       position:fixed; inset:0; z-index:100;
       background:rgba(0,0,0,0.85);
@@ -142,7 +139,6 @@
     }
     .mem-close:hover { background:rgba(168,85,247,0.4); }
 
-    /* ── EMPTY MSG ── */
     .g-empty {
       position:fixed; bottom:80px; left:50%;
       transform:translateX(-50%);
@@ -154,7 +150,6 @@
     }
     .g-empty.visible { display:block; }
 
-    /* ── NODE TOOLTIP ── */
     #node-tooltip {
       position:fixed; z-index:60;
       padding:8px 16px;
@@ -174,7 +169,7 @@
 
 <canvas id="gc"></canvas>
 
-<!-- UI -->
+
 <div class="g-ui">
   <a href="index.html" class="btn-back">← Volver</a>
   <div class="g-title-wrap">
@@ -191,13 +186,10 @@
   <span style="font-size:0.78rem">Añade recuerdos desde la página principal</span>
 </div>
 
-<!-- Node tooltip -->
 <div id="node-tooltip"></div>
 
-<!-- Backdrop -->
 <div class="mem-backdrop" id="mem-backdrop"></div>
 
-<!-- Popup -->
 <div class="mem-popup" id="mem-popup">
   <button class="mem-close" id="mem-close">✕</button>
   <div class="mem-foto-wrap" id="mem-foto-wrap">
@@ -221,20 +213,17 @@
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════
-   CONFIG
-═══════════════════════════════════════════ */
 const CFG = {
-  PERSP:        0.28,   // Slightly more tilt
-  MAX_R:        1100,   // MASSIVE zoom (visualizing from much closer)
-  NUM_DISK:     5500,   // Dense arms
-  NUM_DUST:     2200,   // Lots of space dust
-  NUM_HEART:    1200,   // Heart particles
-  NUM_BG_STARS: 500,    // More stars
-  NUM_MAGIC:    180,    // Floating foreground magical stardust
-  HEART_SCALE:  6.0,    // Shrink the heart drastically
+  PERSP:        0.28,   
+  MAX_R:        1100,   
+  NUM_DISK:     5500,   
+  NUM_DUST:     2200,   
+  NUM_HEART:    1200,   
+  NUM_BG_STARS: 500,    
+  NUM_MAGIC:    180,    
+  HEART_SCALE:  6.0,    
   ROTATE_SPEED: 0.00035,
-  NODE_R:       44,     // Even bigger memory nodes
+  NODE_R:       44,     
 };
 
 const GRAD_MAP = {
@@ -247,9 +236,7 @@ const GRAD_MAP = {
 };
 const BADGE_LABEL = { especial:'💖 Especial', viaje:'✈️ Viaje', cotidiano:'☕ Cotidiano', celebracion:'🎉 Celebración' };
 
-/* ═══════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════ */
+
 const canvas = document.getElementById('gc');
 const ctx = canvas.getContext('2d');
 
@@ -260,7 +247,7 @@ let mouse = { x:-9999, y:-9999 };
 let hoveredNode = null;
 let selectedMemory = null;
 
-// Particle arrays
+
 let bgStars = [];
 let diskParticles = [];
 let dustParticles = [];
@@ -270,11 +257,9 @@ let memoryNodes = [];
 let magicParticles = [];
 let preloadedImages = {};
 
-/* ═══════════════════════════════════════════
-   LOAD DATA
-═══════════════════════════════════════════ */
+
 function loadMemories() {
-  // Ahora Firebase maneja la carga. Esta función se mantiene vacía para compatibilidad si fuera necesaria.
+
   return [];
 }
 
@@ -285,9 +270,6 @@ function formatFecha(iso) {
   return `${parseInt(d)} de ${M[parseInt(m)-1]}, ${y}`;
 }
 
-/* ═══════════════════════════════════════════
-   GENERATORS
-═══════════════════════════════════════════ */
 
 function genBgStars() {
   bgStars = [];
@@ -305,19 +287,18 @@ function genBgStars() {
 
 function genDiskParticles() {
   diskParticles = [];
-  const a = 40, b = 0.175; // a=40 scales the entire spiral mathematical base
+  const a = 40, b = 0.175; 
   for (let i = 0; i < CFG.NUM_DISK; i++) {
     const arm = i % 2;
     const armOff = arm * Math.PI;
     const theta = (i / CFG.NUM_DISK) * Math.PI * 4.5 + Math.random() * 0.6;
     const r = Math.min(a * Math.exp(b * theta) + Math.random() * 30, CFG.MAX_R);
 
-    // angular scatter increases with radius
     const scatter = (Math.random() - 0.5) * (0.3 + r / CFG.MAX_R * 0.8);
     const baseAngle = theta + armOff + scatter;
 
-    const rNorm = r / CFG.MAX_R; // 0–1
-    // Color: center=warm orange, mid=brownish, edge=dark red/brown
+    const rNorm = r / CFG.MAX_R; 
+
     let color;
     if (rNorm < 0.15)      color = `rgba(255,210,120,`;
     else if (rNorm < 0.35) color = `rgba(240,140,60,`;
@@ -358,11 +339,9 @@ function genHeartParticles() {
 
   for (let i = 0; i < CFG.NUM_HEART; i++) {
     const t0 = (i / CFG.NUM_HEART) * Math.PI * 2;
-    // parametric heart
     const hx = 16 * Math.pow(Math.sin(t0), 3) * S;
     const hy = -(13*Math.cos(t0) - 5*Math.cos(2*t0) - 2*Math.cos(3*t0) - Math.cos(4*t0)) * S;
 
-    // add cloud-like noise
     const noise = S * 0.85;
     const nx = hx + (Math.random() - 0.5) * noise;
     const ny = hy + (Math.random() - 0.5) * noise;
@@ -378,7 +357,6 @@ function genHeartParticles() {
       baseAlpha: Math.random() * 0.75 + 0.2,
       phase: Math.random() * Math.PI * 2,
       speed: Math.random() * 0.035 + 0.008,
-      // some particles drift slightly
       drift: (Math.random() - 0.5) * 0.15,
     });
   }
@@ -388,7 +366,7 @@ function genBeamParticles() {
   beamParticles = [];
   for (let i = 0; i < 60; i++) {
     beamParticles.push({
-      progress: Math.random(), // 0=galaxy, 1=heart
+      progress: Math.random(), 
       offset: (Math.random() - 0.5) * 12,
       speed: Math.random() * 0.004 + 0.002,
       size: Math.random() * 2.5 + 0.5,
@@ -405,7 +383,7 @@ function genMagicParticles() {
       y: Math.random() * H,
       r: Math.random() * 2.5 + 0.5,
       speedX: (Math.random() - 0.5) * 0.6,
-      speedY: (Math.random() - 0.5) * 0.6 - 0.3, // Slight upward drift
+      speedY: (Math.random() - 0.5) * 0.6 - 0.3, 
       phase: Math.random() * Math.PI * 2,
       color: Math.random() > 0.5 ? 'rgba(168,85,247,' : 'rgba(236,72,153,'
     });
@@ -419,10 +397,9 @@ function placeMemoryNodes(memories) {
 
   for (let i = 0; i < count; i++) {
     const mem = memories[i];
-    // Spread along spiral: alternate arms
     const frac = (i / count);
     const theta = 1.0 + frac * Math.PI * 3.5;
-    const a = 40, b = 0.175; // Match new spiral scale
+    const a = 40, b = 0.175; 
     const r = Math.min(a * Math.exp(b * theta) + 120, CFG.MAX_R - 80);
     const armOff = (i % 2) * Math.PI;
 
@@ -435,14 +412,12 @@ function placeMemoryNodes(memories) {
       angle: startAngle,
       orbSpeed,
       pulse: Math.random() * Math.PI * 2,
-      img: null, // will be set if memory has image
+      img: null, 
     });
   }
 }
 
-/* ═══════════════════════════════════════════
-   PRELOAD IMAGES
-═══════════════════════════════════════════ */
+
 function preloadImages(memories) {
   memories.forEach((mem, i) => {
     if (mem.imagen) {
@@ -453,9 +428,6 @@ function preloadImages(memories) {
   });
 }
 
-/* ═══════════════════════════════════════════
-   DRAW FUNCTIONS
-═══════════════════════════════════════════ */
 
 function drawBgStars() {
   for (const s of bgStars) {
@@ -469,7 +441,6 @@ function drawBgStars() {
 }
 
 function drawDisk() {
-  // All disk + dust particles
   const allDisk = [...dustParticles, ...diskParticles];
   for (const p of allDisk) {
     const angle = p.baseAngle + galaxyAngle;
@@ -478,7 +449,6 @@ function drawDisk() {
     const sx = cx + dx;
     const sy = cy + dy;
 
-    // cull offscreen
     if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
 
     ctx.beginPath();
@@ -489,7 +459,6 @@ function drawDisk() {
 }
 
 function drawGalaxyGlow() {
-  // Core glow layers
   const glows = [
     { r: 240, c: [255,180,80], a: 0.08 },
     { r: 140, c: [255,210,120], a: 0.18 },
@@ -506,12 +475,11 @@ function drawGalaxyGlow() {
     ctx.fill();
   }
 
-  // Accretion disk ring (perspective ellipse)
   ctx.save();
   ctx.translate(cx, cy);
   ctx.scale(1, CFG.PERSP);
   for (let ring = 0; ring < 3; ring++) {
-    const rr = 32 + ring * 12; // Scaled up ring
+    const rr = 32 + ring * 12; 
     const rGrad = ctx.createRadialGradient(0, 0, rr - 6, 0, 0, rr + 6);
     rGrad.addColorStop(0, 'rgba(255,170,50,0)');
     rGrad.addColorStop(0.5, `rgba(255,200,80,${0.6 - ring * 0.15})`);
@@ -524,7 +492,6 @@ function drawGalaxyGlow() {
   }
   ctx.restore();
 
-  // Black hole center
   ctx.beginPath();
   ctx.arc(cx, cy, 18, 0, Math.PI * 2);
   ctx.fillStyle = '#000';
@@ -540,7 +507,6 @@ function drawBeam() {
   const heartBottom = { x: cx, y: heartCY + CFG.HEART_SCALE * 4 };
   const beamTop = { x: cx, y: heartCY - CFG.HEART_SCALE * 13 };
 
-  // Main beam glow
   const bGrad = ctx.createLinearGradient(cx, cy, cx, beamTop.y);
   bGrad.addColorStop(0, 'rgba(255,180,60,0.0)');
   bGrad.addColorStop(0.15, 'rgba(200,80,200,0.25)');
@@ -554,7 +520,6 @@ function drawBeam() {
   ctx.lineWidth = 8;
   ctx.stroke();
 
-  // Thin bright core
   const bGrad2 = ctx.createLinearGradient(cx, cy, cx, beamTop.y);
   bGrad2.addColorStop(0, 'rgba(255,220,100,0)');
   bGrad2.addColorStop(0.1, 'rgba(255,180,255,0.6)');
@@ -567,7 +532,6 @@ function drawBeam() {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Beam particles flowing up
   for (const p of beamParticles) {
     p.progress += p.speed;
     if (p.progress > 1) p.progress = 0;
@@ -583,18 +547,16 @@ function drawBeam() {
 }
 
 function drawHeart() {
-  const heartBreath = 1 + 0.04 * Math.sin(t * 1.5); // Global heart breath
+  const heartBreath = 1 + 0.04 * Math.sin(t * 1.5); 
 
   for (const p of heartParticles) {
     p.phase += p.speed;
     p.x += p.drift * 0.5;
-    // keep particles near original position (spring-like)
     const alpha = p.baseAlpha * (0.5 + 0.5 * Math.sin(p.phase));
 
     const sx = cx + p.x * heartBreath;
     const sy = heartCY + p.y * heartBreath;
 
-    // Glow halo
     const glowR = p.r * 4;
     const gGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
     gGrad.addColorStop(0, hexToRgba(p.col, alpha * 0.45));
@@ -604,7 +566,6 @@ function drawHeart() {
     ctx.fillStyle = gGrad;
     ctx.fill();
 
-    // Core particle
     ctx.beginPath();
     ctx.arc(sx, sy, p.r, 0, Math.PI * 2);
     ctx.fillStyle = hexToRgba(p.col, alpha);
@@ -631,7 +592,6 @@ function drawMemoryNodes() {
     const sx = cx + dx;
     const sy = cy + dy;
 
-    // Cull offscreen
     if (sx < -nodeR-10 || sx > W+nodeR+10 || sy < -nodeR-10 || sy > H+nodeR+10) continue;
 
     const isHovered = hoveredNode === node;
@@ -641,7 +601,6 @@ function drawMemoryNodes() {
     const mem = node.memory;
     const [c1, c2] = GRAD_MAP[mem.color] || ['#a855f7','#ec4899'];
 
-    // Outer glow
     const glowA = isHovered ? 0.55 : 0.3 + 0.1 * Math.sin(node.pulse);
     const glowGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rr * 2.5);
     glowGrad.addColorStop(0, hexToRgba(c1, glowA));
@@ -651,7 +610,6 @@ function drawMemoryNodes() {
     ctx.fillStyle = glowGrad;
     ctx.fill();
 
-    // Ring
     const ringGrad = ctx.createLinearGradient(sx - rr, sy - rr, sx + rr, sy + rr);
     ringGrad.addColorStop(0, c1);
     ringGrad.addColorStop(1, c2);
@@ -661,21 +619,17 @@ function drawMemoryNodes() {
     ctx.lineWidth = isHovered ? 3 : 2;
     ctx.stroke();
 
-    // Photo or emoji background
     if (preloadedImages[mem.id]) {
-      // Circular photo
       ctx.save();
       ctx.beginPath();
       ctx.arc(sx, sy, rr, 0, Math.PI * 2);
       ctx.clip();
       const img = preloadedImages[mem.id];
       ctx.drawImage(img, sx - rr, sy - rr, rr * 2, rr * 2);
-      // dim overlay
       ctx.fillStyle = 'rgba(0,0,0,0.2)';
       ctx.fillRect(sx - rr, sy - rr, rr * 2, rr * 2);
       ctx.restore();
     } else {
-      // Gradient circle
       const bgGrad = ctx.createRadialGradient(sx - rr*0.3, sy - rr*0.3, 0, sx, sy, rr);
       bgGrad.addColorStop(0, hexToRgba(c1, 0.35));
       bgGrad.addColorStop(1, 'rgba(5,5,15,0.85)');
@@ -684,14 +638,12 @@ function drawMemoryNodes() {
       ctx.fillStyle = bgGrad;
       ctx.fill();
 
-      // Emoji
       ctx.font = `${rr * 0.9}px serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(mem.emoji, sx, sy);
     }
 
-    // Store screen pos for click detection
     node._sx = sx;
     node._sy = sy;
     node._rr = rr;
@@ -704,20 +656,17 @@ function drawMagicParticles() {
     p.y += p.speedY;
     p.phase += 0.015;
 
-    // Wrap around screen
     if (p.x < -10) p.x = W + 10; else if (p.x > W + 10) p.x = -10;
     if (p.y < -10) p.y = H + 10; else if (p.y > H + 10) p.y = -10;
 
     const alpha = 0.2 + 0.6 * Math.sin(p.phase);
     if (alpha <= 0) continue;
 
-    // Inner bright core
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fillStyle = p.color + alpha + ')';
     ctx.fill();
     
-    // Outer glow for larger magic particles
     if (p.r > 1.2) {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
@@ -727,18 +676,13 @@ function drawMagicParticles() {
   }
 }
 
-/* ═══════════════════════════════════════════
-   MAIN RENDER LOOP
-═══════════════════════════════════════════ */
 function draw() {
   t += 0.01;
   galaxyAngle += CFG.ROTATE_SPEED;
 
-  // Background
   ctx.fillStyle = '#000008';
   ctx.fillRect(0, 0, W, H);
 
-  // Subtle nebula background
   const nebGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.7);
   nebGrad.addColorStop(0, 'rgba(30,8,50,0.4)');
   nebGrad.addColorStop(0.5, 'rgba(10,3,25,0.2)');
@@ -757,9 +701,6 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-/* ═══════════════════════════════════════════
-   INTERACTION
-═══════════════════════════════════════════ */
 canvas.addEventListener('mousemove', (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
@@ -806,7 +747,6 @@ function openPopup(mem) {
   const fotoWrap = document.getElementById('mem-foto-wrap');
   const fotoEl = document.getElementById('mem-foto');
 
-  // Photo
   if (mem.imagen) {
     fotoEl.src = mem.imagen;
     fotoWrap.classList.add('visible');
@@ -817,7 +757,6 @@ function openPopup(mem) {
     popup.classList.remove('has-foto');
   }
 
-  // Colors
   const [c1, c2] = GRAD_MAP[mem.color] || ['#a855f7','#ec4899'];
   headerBar.style.setProperty('--mem-grad', `linear-gradient(135deg,${c1},${c2})`);
   popup.style.setProperty('--mem-grad', `linear-gradient(135deg,${c1},${c2})`);
@@ -843,11 +782,7 @@ document.getElementById('mem-close').addEventListener('click', closePopup);
 document.getElementById('mem-backdrop').addEventListener('click', closePopup);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
 
-/* ═══════════════════════════════════════════
-   RESIZE
-═══════════════════════════════════════════ */
 function resize() {
-  // Force extreme high definition on all screens
   const dpr = Math.max(window.devicePixelRatio || 1, 2.5);
   W = window.innerWidth;
   H = window.innerHeight;
@@ -857,17 +792,14 @@ function resize() {
   canvas.style.width  = `${W}px`;
   canvas.style.height = `${H}px`;
 
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+  ctx.setTransform(1, 0, 0, 1, 0, 0); 
   ctx.scale(dpr, dpr);
 
   cx = W / 2;
-  cy = H * 0.65; // Push center slightly down
-  heartCY = cy - (H < 700 ? 250 : 350); // Move heart up accordingly
+  cy = H * 0.65; 
+  heartCY = cy - (H < 700 ? 250 : 350); 
 }
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
 function init() {
   resize();
   window.addEventListener('resize', () => { resize(); genBgStars(); genMagicParticles(); });
@@ -879,7 +811,6 @@ function init() {
   genBeamParticles();
   genMagicParticles();
 
-  // Escuchar cambios en la base de datos de Firebase
   db.ref('recuerdos').on('value', (snapshot) => {
     const data = snapshot.val();
     const memories = [];
@@ -889,11 +820,9 @@ function init() {
       }
     }
 
-    // Stats
     const countEl = document.getElementById('g-count');
     countEl.innerHTML = `<strong>${memories.length}</strong> recuerdos<br/><strong>${memories.filter(m=>m.imagen).length}</strong> con foto`;
 
-    // Empty state
     if (!memories.length) {
       document.getElementById('g-empty').classList.add('visible');
       document.getElementById('g-hint').style.display = 'none';
