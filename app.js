@@ -1,19 +1,13 @@
-/* =============================================
-   APP.JS — Nuestro Universo de Recuerdos v2
-   Con soporte de imágenes PNG/JPG
-   ============================================= */
 
-// ─── ESTADO ──────────────────────────────────────
 const STATE = {
   recuerdos: [],
   filtroActivo: 'todos',
   colorActivo: 'purple',
   emojiActivo: '💖',
-  imagenBase64: null,      // imagen en memoria antes de guardar
+  imagenBase64: null,      
   veriendo: null,
 };
 
-// ─── UTILS ───────────────────────────────────────
 
 function generarId() {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -48,7 +42,7 @@ function escapeHtml(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ─── FIREBASE / BASE DE DATOS ───────────────────────────────
+
 
 function cargarDatos() {
   db.ref('recuerdos').on('value', (snapshot) => {
@@ -80,7 +74,6 @@ function borrarDato(id) {
   }
 }
 
-// ─── CANVAS UNIVERSO ─────────────────────────────
 
 class UniversoCanvas {
   constructor(el) {
@@ -175,7 +168,6 @@ class UniversoCanvas {
     window.addEventListener('resize', () => { this.resize(); this.createStars(); });
     window.addEventListener('mousemove', (e) => { this.mouse.x = e.clientX; this.mouse.y = e.clientY; });
 
-    // Estrella fugaz aleatoria
     setInterval(() => {
       if (Math.random() < 0.6) this.spawnShootingStar();
     }, 4000);
@@ -194,7 +186,6 @@ class UniversoCanvas {
     const mx = (this.mouse.x - W / 2) / W;
     const my = (this.mouse.y - H / 2) / H;
 
-    // Estrellas
     for (const s of this.stars) {
       s.twinkle += s.twinkleSpeed;
       s.alpha = s.baseAlpha + Math.sin(s.twinkle) * 0.25;
@@ -214,7 +205,6 @@ class UniversoCanvas {
       ctx.fill();
 
       if (s.r > 1.3) {
-        // Cruz de destello
         const len = s.r * (3 + glow * 2);
         ctx.strokeStyle = `${s.color}${a * 0.4})`;
         ctx.lineWidth = 0.5;
@@ -229,7 +219,6 @@ class UniversoCanvas {
       }
     }
 
-    // Estrellas fugaces
     for (let i = this.shootingStars.length - 1; i >= 0; i--) {
       const ss = this.shootingStars[i];
       ss.life++;
@@ -251,14 +240,12 @@ class UniversoCanvas {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Cabeza brillante
       ctx.beginPath();
       ctx.arc(ss.x, ss.y, 2, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255,255,255,${ss.alpha})`;
       ctx.fill();
     }
 
-    // Partículas flotantes
     for (let i = 0; i < this.particles.length; i++) {
       const p = this.particles[i];
       p.life++;
@@ -277,7 +264,6 @@ class UniversoCanvas {
       ctx.fillStyle = `${p.color}${p.alpha})`;
       ctx.fill();
 
-      // Halo
       const g2 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
       g2.addColorStop(0, `${p.color}${p.alpha * 0.35})`);
       g2.addColorStop(1, `${p.color}0)`);
@@ -289,13 +275,11 @@ class UniversoCanvas {
   }
 }
 
-// ─── IMAGEN — UPLOAD ─────────────────────────────
 
 function setupUpload() {
   const zone = document.getElementById('upload-zone');
   const input = document.getElementById('input-imagen');
 
-  // Clic en la zona
   zone.addEventListener('click', (e) => {
     if (e.target.id === 'btn-remove-img') return;
     input.click();
@@ -304,12 +288,10 @@ function setupUpload() {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
   });
 
-  // Cambio de archivo
   input.addEventListener('change', () => {
     if (input.files[0]) processFile(input.files[0]);
   });
 
-  // Drag & Drop
   zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
   zone.addEventListener('drop', (e) => {
@@ -320,7 +302,6 @@ function setupUpload() {
     else showToast('⚠️ Solo se aceptan imágenes');
   });
 
-  // Botón quitar
   document.getElementById('btn-remove-img').addEventListener('click', (e) => {
     e.stopPropagation();
     clearImagePreview();
@@ -334,7 +315,6 @@ function processFile(file) {
   }
   const reader = new FileReader();
   reader.onload = (e) => {
-    // Comprimir la imagen para que no sature la base de datos de Firebase
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -354,7 +334,6 @@ function processFile(file) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
       
-      // Convertir a JPEG comprimido (0.65 de calidad = muy ligero)
       const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
       STATE.imagenBase64 = dataUrl;
       showImagePreview(dataUrl);
@@ -379,7 +358,6 @@ function clearImagePreview() {
   document.getElementById('input-imagen').value = '';
 }
 
-// ─── RENDER ──────────────────────────────────────
 
 const BADGE_CLASS = { especial:'badge-especial', viaje:'badge-viaje', cotidiano:'badge-cotidiano', celebracion:'badge-celebracion' };
 const BADGE_LABEL = { especial:'💖 Especial', viaje:'✈️ Viaje', cotidiano:'☕ Cotidiano', celebracion:'🎉 Celebración' };
@@ -443,7 +421,6 @@ function renderGaleria() {
     </article>
   `).join('');
 
-  // Eventos
   galeria.querySelectorAll('.tarjeta').forEach(el => {
     el.addEventListener('click', (e) => {
       if (e.target.classList.contains('tarjeta-expand-btn')) return;
@@ -477,7 +454,6 @@ function actualizarStats() {
   }
 }
 
-// ─── MODAL AÑADIR ────────────────────────────────
 
 function abrirModal() {
   document.getElementById('modal-overlay').classList.add('open');
@@ -512,7 +488,6 @@ function resetPickers() {
   });
 }
 
-// ─── MODAL VER ───────────────────────────────────
 
 function abrirRecuerdo(id) {
   const r = STATE.recuerdos.find(x => x.id === id);
@@ -525,7 +500,6 @@ function abrirRecuerdo(id) {
   const fotoWrap = document.getElementById('ver-foto-wrap');
   const fotoEl = document.getElementById('ver-foto');
 
-  // Foto
   if (r.imagen) {
     fotoWrap.style.display = 'block';
     fotoEl.src = r.imagen;
@@ -538,7 +512,6 @@ function abrirRecuerdo(id) {
     fotoEl.onclick = null;
   }
 
-  // Header
   header.style.setProperty('--card-grad', GRAD_MAP[r.color] || GRAD_MAP.purple);
   document.getElementById('ver-emoji').textContent = r.emoji;
   document.getElementById('ver-badge').textContent = BADGE_LABEL[r.categoria] || 'Especial';
@@ -556,7 +529,6 @@ function cerrarVerModal() {
   STATE.veriendo = null;
 }
 
-// ─── LIGHTBOX ────────────────────────────────────
 
 function abrirLightbox(src) {
   const lb = document.getElementById('lightbox');
@@ -570,7 +542,6 @@ function cerrarLightbox() {
   document.body.style.overflow = '';
 }
 
-// ─── GUARDAR ─────────────────────────────────────
 
 function guardarRecuerdo(e) {
   e.preventDefault();
@@ -595,7 +566,6 @@ function guardarRecuerdo(e) {
     creadoEn: new Date().toISOString(),
   };
 
-  // Firebase lo guardará y disparará 'value', que llama a renderGaleria() solo
   guardarDatos(recuerdo);
   
   cerrarModal();
@@ -616,7 +586,6 @@ function shakeField(id) {
   el.focus();
 }
 
-// ─── ELIMINAR ────────────────────────────────────
 
 function eliminarRecuerdo() {
   if (!STATE.veriendo) return;
@@ -626,7 +595,6 @@ function eliminarRecuerdo() {
   showToast('🌠 Recuerdo eliminado del universo');
 }
 
-// ─── FILTROS ─────────────────────────────────────
 
 function setupFiltros() {
   document.querySelectorAll('.filtro-btn').forEach(btn => {
@@ -639,7 +607,6 @@ function setupFiltros() {
   });
 }
 
-// ─── PICKERS ─────────────────────────────────────
 
 function setupPickers() {
   document.getElementById('color-picker').addEventListener('click', (e) => {
@@ -659,7 +626,6 @@ function setupPickers() {
   });
 }
 
-// ─── CHAR COUNTERS ───────────────────────────────
 
 function setupCharCounters() {
   const ti = document.getElementById('input-titulo');
@@ -668,7 +634,6 @@ function setupCharCounters() {
   di.addEventListener('input', () => { document.getElementById('char-desc').textContent = `${di.value.length}/500`; });
 }
 
-// ─── INIT ─────────────────────────────────────────
 
 function init() {
   new UniversoCanvas(document.getElementById('universo-canvas'));
@@ -677,29 +642,24 @@ function init() {
   renderGaleria();
   actualizarStats();
 
-  // Botones principal
   document.getElementById('btn-agregar').addEventListener('click', abrirModal);
   document.getElementById('modal-close').addEventListener('click', cerrarModal);
   document.getElementById('btn-cancelar').addEventListener('click', cerrarModal);
   document.getElementById('modal-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) cerrarModal(); });
 
-  // Modal ver
   document.getElementById('modal-ver-close').addEventListener('click', cerrarVerModal);
   document.getElementById('modal-ver-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) cerrarVerModal(); });
   document.getElementById('btn-eliminar').addEventListener('click', eliminarRecuerdo);
 
-  // Lightbox
   document.getElementById('lightbox-close').addEventListener('click', cerrarLightbox);
   document.getElementById('lightbox').addEventListener('click', (e) => { if (e.target === e.currentTarget || e.target.tagName === 'IMG') cerrarLightbox(); });
 
-  // Form & upload
   document.getElementById('form-recuerdo').addEventListener('submit', guardarRecuerdo);
   setupUpload();
   setupFiltros();
   setupPickers();
   setupCharCounters();
 
-  // Escape cierra todo
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       cerrarModal();
