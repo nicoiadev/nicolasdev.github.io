@@ -1,6 +1,4 @@
-/* =========================================
-   NUESTRO UNIVERSO — CSS COMPLETO v2
-   ========================================= */
+
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -50,10 +48,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ===========================
-   CANVAS
-   =========================== */
-
 #universo-canvas {
   position: fixed;
   inset: 0;
@@ -61,9 +55,6 @@ body {
   pointer-events: none;
 }
 
-/* ===========================
-   PLANETAS
-   =========================== */
 
 .planeta {
   position: fixed;
@@ -115,9 +106,6 @@ body {
   66% { transform: translateY(10px) rotate(-2deg); }
 }
 
-/* ===========================
-   LUNAS
-   =========================== */
 
 .luna {
   position: fixed;
@@ -149,10 +137,6 @@ body {
   to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
 }
 
-/* ===========================
-   COMETA
-   =========================== */
-
 .cometa {
   position: fixed;
   z-index: 2;
@@ -182,9 +166,6 @@ body {
   100% { left: 110vw; top: 35%; opacity: 0; }
 }
 
-/* ===========================
-   NEBULOSAS
-   =========================== */
 
 .nebula {
   position: fixed;
@@ -205,9 +186,6 @@ body {
   66% { opacity: 0.8; transform: scale(0.94) translate(-18px,18px); }
 }
 
-/* ===========================
-   HEADER
-   =========================== */
 
 .header {
   position: fixed;
@@ -253,9 +231,6 @@ body {
   text-transform: uppercase;
 }
 
-/* ===========================
-   BOTONES
-   =========================== */
 
 .btn-primary {
   display: inline-flex; align-items: center; gap: 8px;
@@ -315,7 +290,6 @@ body {
 
 .btn-icon { font-size: 1rem; }
 
-/* Galaxy buttons */
 .btn-galaxy {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 11px 22px;
@@ -339,7 +313,6 @@ body {
   box-shadow: 0 8px 24px rgba(168,85,247,0.35);
 }
 
-/* Hero galaxy CTA */
 .btn-galaxy-hero {
   display: inline-flex; align-items: center; gap: 12px;
   margin-top: 28px;
@@ -379,10 +352,6 @@ body {
   z-index: -1;
 }
 .btn-galaxy-hero:hover .galaxy-btn-glow { opacity: 0.3; }
-
-/* ===========================
-   HERO
-   =========================== */
 
 .hero {
   position: relative;
@@ -493,9 +462,6 @@ body {
   100% { transform: translate(-50%,-50%) scale(1.4); opacity: 0; }
 }
 
-/* ===========================
-   GALERIA
-   =========================== */
 
 .galeria-container {
   position: relative;
@@ -552,10 +518,6 @@ body {
   gap: 24px;
 }
 
-/* ===========================
-   TARJETA
-   =========================== */
-
 .tarjeta {
   position: relative;
   background: var(--surface);
@@ -580,7 +542,6 @@ body {
   box-shadow: var(--shadow-card), var(--shadow-glow);
 }
 
-/* Foto de la tarjeta */
 .tarjeta-foto-wrap {
   position: relative;
   width: 100%;
@@ -621,7 +582,6 @@ body {
 .tarjeta:hover .tarjeta-expand-btn { opacity: 1; }
 .tarjeta-expand-btn:hover { background: rgba(168,85,247,0.6); }
 
-/* Cuerpo de la tarjeta */
 .tarjeta-body { padding: 22px 22px 18px; }
 
 .tarjeta-glow {
@@ -699,7 +659,6 @@ body {
 }
 .tarjeta:hover .tarjeta-leer { opacity: 1; }
 
-/* Colores */
 .tarjeta[data-color="purple"] { --card-grad: linear-gradient(135deg,#a855f7,#ec4899); }
 .tarjeta[data-color="blue"]   { --card-grad: linear-gradient(135deg,#3b82f6,#06b6d4); }
 .tarjeta[data-color="rose"]   { --card-grad: linear-gradient(135deg,#f43f5e,#fb7185); }
@@ -707,7 +666,6 @@ body {
 .tarjeta[data-color="teal"]   { --card-grad: linear-gradient(135deg,#14b8a6,#84cc16); }
 .tarjeta[data-color="indigo"] { --card-grad: linear-gradient(135deg,#6366f1,#a855f7); }
 
-/* Borde superior de color */
 .tarjeta::before {
   content: '';
   position: absolute;
@@ -719,9 +677,6 @@ body {
 }
 .tarjeta:hover::before { opacity: 1; height: 4px; }
 
-/* ===========================
-   EMPTY STATE
-   =========================== */
 
 .empty-state {
   display: none;
@@ -737,9 +692,6 @@ body {
 .empty-state p { color: var(--text-muted); max-width: 420px; line-height: 1.7; margin-bottom: 8px; }
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
 
-/* ===========================
-   MODAL BASE
-   =========================== */
 
 .modal-overlay {
   position: fixed;
@@ -806,9 +758,6 @@ body {
 }
 .modal-header p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* ===========================
-   UPLOAD ZONE
-   =========================== */
 
 .upload-zone {
   border: 2px dashed rgba(168,85,247,0.3);
@@ -872,9 +821,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* ===========================
-   FORM
-   =========================== */
 
 .form-group { margin-bottom: 22px; position: relative; }
 .form-group label {
@@ -918,10 +864,6 @@ body {
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-/* ===========================
-   PICKERS
-   =========================== */
-
 .color-picker, .emoji-picker { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .color-opt {
@@ -954,10 +896,6 @@ body {
   margin-top: 32px; padding-top: 24px;
   border-top: 1px solid var(--border);
 }
-
-/* ===========================
-   MODAL VER RECUERDO
-   =========================== */
 
 .modal-ver { max-width: 520px; padding: 0; overflow: hidden; }
 
@@ -1016,10 +954,6 @@ body {
 
 .modal-ver .modal-close { top: 14px; right: 14px; z-index: 10; background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.15); }
 
-/* ===========================
-   LIGHTBOX
-   =========================== */
-
 .lightbox {
   position: fixed;
   inset: 0;
@@ -1062,10 +996,6 @@ body {
 }
 .lightbox-close:hover { background: rgba(168,85,247,0.4); }
 
-/* ===========================
-   TOAST
-   =========================== */
-
 .toast {
   position: fixed;
   bottom: 32px; left: 50%;
@@ -1084,27 +1014,16 @@ body {
 }
 .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ===========================
-   ANIMACIONES GLOBALES
-   =========================== */
-
 @keyframes pulse-glow {
   0%,100% { filter: drop-shadow(0 0 10px rgba(168,85,247,0.7)); }
   50%      { filter: drop-shadow(0 0 22px rgba(236,72,153,0.9)); }
 }
 
-/* ===========================
-   SCROLLBAR
-   =========================== */
 
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(168,85,247,0.5); }
-
-/* ===========================
-   RESPONSIVE
-   =========================== */
 
 @media (max-width: 640px) {
   .header { padding: 12px 16px; }
